@@ -2,85 +2,150 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Bookified - AI Reader Book Assistant</title>
+  <title>Bookified - Interactive AI Reader Platform</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- PDF.js CDN for in-browser client PDF parsing -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
   <style>
-    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #FAF7F2; }
-    h1, h2, h3, .serif-font { font-family: 'Cinzel', serif; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #F8F5F0;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(217, 196, 169, 0.25) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(180, 140, 100, 0.15) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(245, 239, 230, 0.6) 0px, transparent 100%);
+      background-attachment: fixed;
+    }
+    .serif-title {
+      font-family: 'Cinzel', serif;
+    }
+    .vintage-glass {
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(180, 140, 100, 0.22);
+    }
+    .banner-glass {
+      background: linear-gradient(135deg, rgba(246, 237, 224, 0.95) 0%, rgba(237, 222, 203, 0.85) 100%);
+      border: 1px solid rgba(160, 115, 75, 0.25);
+    }
+    .book-shadow {
+      box-shadow: 0 14px 28px -4px rgba(60, 40, 20, 0.15), 0 8px 12px -6px rgba(60, 40, 20, 0.1);
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 5px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.03);
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: rgba(160, 115, 75, 0.25);
+      border-radius: 9999px;
+    }
   </style>
 </head>
-<body class="text-slate-800 flex flex-col min-h-screen">
+<body class="text-slate-800 flex flex-col min-h-screen custom-scroll selection:bg-amber-800 selection:text-white">
 
   <!-- Navigation Bar -->
-  <header class="bg-[#FAF7F2]/90 backdrop-blur sticky top-0 z-30 border-b border-amber-900/10 px-8 py-4 flex items-center justify-between">
-    <div class="flex items-center space-x-2.5">
-      <div class="w-8 h-8 rounded-lg bg-amber-900 text-amber-50 flex items-center justify-center font-bold text-lg shadow-sm">
-        📖
+  <header class="sticky top-0 z-40 bg-[#FAF6F0]/85 backdrop-blur-md border-b border-amber-900/10 px-6 sm:px-10 py-3.5 flex items-center justify-between transition-all">
+    <!-- Brand Logo -->
+    <div class="flex items-center space-x-3 cursor-pointer" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-800 via-amber-900 to-amber-950 text-amber-100 flex items-center justify-center shadow-md border border-amber-700/30">
+        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+          <path d="M12 3.75c-3.1 0-6.15-1.2-8.5-3.5v16.5c2.35 2.3 5.4 3.5 8.5 3.5s6.15-1.2 8.5-3.5V.25C18.15 2.55 15.1 3.75 12 3.75zm-1 14.7c-2.45-.3-4.85-1.35-6.75-3.15V3.9c1.9 1.6 4.3 2.55 6.75 2.8v11.75zm8.75-3.15c-1.9 1.8-4.3 2.85-6.75 3.15V6.7c2.45-.25 4.85-1.2 6.75-2.8v11.4z"/>
+        </svg>
       </div>
-      <span class="text-xl font-bold tracking-tight text-slate-900">Bookified</span>
+      <div>
+        <h1 class="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-1.5">
+          <span>Bookified</span>
+          <span class="text-[10px] uppercase tracking-wider font-semibold bg-amber-100 text-amber-900 px-2 py-0.5 rounded-full border border-amber-300">PBL</span>
+        </h1>
+        <p class="text-[10px] text-amber-900/60 font-medium">Interactive AI Reader Assistant</p>
+      </div>
     </div>
     
-    <nav class="flex items-center space-x-8 text-sm font-medium text-slate-600">
-      <a href="#" class="text-slate-900 border-b-2 border-slate-900 pb-0.5">Library</a>
-      <button onclick="openUploadModal()" class="hover:text-slate-900 transition">Add New</button>
-      <a href="#" class="hover:text-slate-900 transition">Pricing</a>
-      <button class="hover:text-slate-900 transition">Sign in</button>
-      <button id="voiceToggleBtn" onclick="toggleVoiceOutput()" class="text-xs bg-amber-100/70 border border-amber-300 text-amber-900 px-3 py-1.5 rounded-full font-semibold hover:bg-amber-200 transition">
-        🔊 AI Voice: ON
+    <!-- Navigation Links -->
+    <nav class="flex items-center space-x-7 text-xs font-semibold text-slate-600">
+      <a href="#" class="text-amber-900 border-b-2 border-amber-900 pb-1 transition">Library</a>
+      <button onclick="openUploadModal()" class="hover:text-amber-900 transition flex items-center gap-1">
+        <span>Add New</span>
+      </button>
+      <a href="#" class="hover:text-amber-900 transition hidden sm:inline-block">Pricing</a>
+      <button class="hover:text-amber-900 transition hidden sm:inline-block">Sign In</button>
+      <button onclick="openUploadModal()" class="bg-gradient-to-r from-amber-800 to-amber-950 text-white px-4 py-2 rounded-xl shadow-sm hover:shadow-md hover:from-amber-900 hover:to-black transition text-xs font-medium flex items-center gap-1.5">
+        <span>+ Upload Book</span>
       </button>
     </nav>
   </header>
 
   <!-- Main Container -->
-  <main class="max-w-6xl w-full mx-auto px-6 py-8 flex-1">
+  <main class="max-w-6xl w-full mx-auto px-4 sm:px-8 py-8 flex-1">
 
     <!-- Hero / "Your Library" Banner -->
-    <div class="bg-[#F3EADB] rounded-3xl p-10 border border-amber-900/10 flex items-center justify-between shadow-sm relative overflow-hidden mb-12">
+    <div class="banner-glass rounded-3xl p-8 sm:p-10 shadow-sm relative overflow-hidden mb-12 flex flex-col md:flex-row items-center justify-between gap-8">
+      
+      <!-- Ambient Lighting Blobs -->
+      <div class="absolute -right-20 -top-20 w-80 h-80 bg-amber-400/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -left-20 -bottom-20 w-80 h-80 bg-orange-400/10 rounded-full blur-3xl pointer-events-none"></div>
+
       <!-- Left Column -->
-      <div class="max-w-md z-10">
-        <h2 class="text-4xl font-bold text-slate-900 mb-3">Your Library</h2>
-        <p class="text-slate-600 text-sm leading-relaxed mb-6">
-          Convert your books into interactive AI conversations. Listen, learn, and discuss your favorite reads.
+      <div class="max-w-md z-10 text-center md:text-left">
+        <span class="inline-block text-[11px] font-bold uppercase tracking-widest text-amber-900/70 mb-2 bg-amber-200/50 px-3 py-1 rounded-full border border-amber-300/60">
+          Smart Digital Learning
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-bold text-slate-900 mb-3 serif-title">Your Library</h2>
+        <p class="text-slate-700 text-sm leading-relaxed mb-6">
+          Convert static books into interactive conversations. Extract page-level summaries, ask technical questions, and learn hands-free.
         </p>
-        <button onclick="openUploadModal()" class="bg-white text-slate-900 font-semibold px-5 py-3 rounded-xl shadow-sm hover:shadow transition border border-amber-900/10 flex items-center space-x-2 text-sm">
-          <span class="text-lg leading-none">+</span>
-          <span>Add new book</span>
-        </button>
-      </div>
-
-      <!-- Center Art Illustration -->
-      <div class="hidden md:flex items-center justify-center px-4">
-        <div class="text-center opacity-85 select-none">
-          <div class="text-7xl filter drop-shadow">📚🧭🕯️</div>
+        <div class="flex items-center justify-center md:justify-start gap-3">
+          <button onclick="openUploadModal()" class="bg-amber-900 hover:bg-amber-950 text-white font-semibold px-5 py-3 rounded-xl shadow-md transition flex items-center space-x-2 text-xs">
+            <span class="text-base leading-none">+</span>
+            <span>Add New Book</span>
+          </button>
+          <button onclick="openChatWithBook('Rich Dad Poor Dad', defaultSamplePages)" class="vintage-glass hover:bg-white text-slate-800 font-semibold px-5 py-3 rounded-xl shadow-sm transition border border-amber-900/15 text-xs flex items-center gap-2">
+            <span>Try Sample 🎙️</span>
+          </button>
         </div>
       </div>
 
-      <!-- Right Steps Widget -->
-      <div class="bg-white/95 rounded-2xl p-5 border border-amber-900/10 shadow-sm w-72 space-y-4 z-10">
+      <!-- Center Thematic Library Illustration -->
+      <div class="hidden lg:flex items-center justify-center relative select-none">
+        <div class="relative w-44 h-44 rounded-2xl bg-amber-900/5 border border-amber-900/15 flex items-center justify-center backdrop-blur-sm p-4 rotate-2 hover:rotate-0 transition duration-500 shadow-sm">
+          <div class="text-center">
+            <span class="text-6xl block mb-2 filter drop-shadow">📚</span>
+            <span class="text-[11px] font-bold text-amber-950 tracking-wider uppercase">Synthesized AI</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Steps Box -->
+      <div class="vintage-glass rounded-2xl p-5 w-full md:w-72 space-y-4 z-10 shadow-sm">
         <div class="flex items-start space-x-3.5">
-          <span class="w-7 h-7 rounded-full border border-slate-300 flex items-center justify-center text-xs font-semibold text-slate-700 bg-slate-50 shrink-0">1</span>
+          <span class="w-8 h-8 rounded-xl bg-amber-900/10 border border-amber-900/20 flex items-center justify-center text-xs font-bold text-amber-900 shrink-0">1</span>
           <div>
-            <h4 class="text-xs font-bold text-slate-800">Upload PDF</h4>
-            <p class="text-[11px] text-slate-500">Add your book file</p>
+            <h4 class="text-xs font-bold text-slate-900">Upload PDF Book</h4>
+            <p class="text-[11px] text-slate-600">Select any PDF chapter or manual</p>
           </div>
         </div>
         <div class="flex items-start space-x-3.5">
-          <span class="w-7 h-7 rounded-full border border-slate-300 flex items-center justify-center text-xs font-semibold text-slate-700 bg-slate-50 shrink-0">2</span>
+          <span class="w-8 h-8 rounded-xl bg-amber-900/10 border border-amber-900/20 flex items-center justify-center text-xs font-bold text-amber-900 shrink-0">2</span>
           <div>
-            <h4 class="text-xs font-bold text-slate-800">AI Processing</h4>
-            <p class="text-[11px] text-slate-500">We analyze the content</p>
+            <h4 class="text-xs font-bold text-slate-900">Smart Page Indexing</h4>
+            <p class="text-[11px] text-slate-600">Extracts structured page metadata</p>
           </div>
         </div>
         <div class="flex items-start space-x-3.5">
-          <span class="w-7 h-7 rounded-full border border-slate-300 flex items-center justify-center text-xs font-semibold text-slate-700 bg-slate-50 shrink-0">3</span>
+          <span class="w-8 h-8 rounded-xl bg-amber-900/10 border border-amber-900/20 flex items-center justify-center text-xs font-bold text-amber-900 shrink-0">3</span>
           <div>
-            <h4 class="text-xs font-bold text-slate-800">Voice Chat</h4>
-            <p class="text-[11px] text-slate-500">Discuss with AI</p>
+            <h4 class="text-xs font-bold text-slate-900">Voice & Text Q&A</h4>
+            <p class="text-[11px] text-slate-600">Get spoken answers and citations</p>
           </div>
         </div>
       </div>
@@ -88,144 +153,204 @@
 
     <!-- Recent Books Header & Search Bar -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-      <h3 class="text-2xl font-bold text-slate-900">Recent Books</h3>
+      <div>
+        <h3 class="text-2xl font-bold text-slate-900 serif-title">Recent Books</h3>
+        <p class="text-xs text-slate-500 mt-0.5">Pick a book from your collection to start conversational learning</p>
+      </div>
       <div class="relative w-full sm:w-80">
-        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 text-sm">🔍</span>
+        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 text-xs">🔍</span>
         <input 
           id="searchBooksInput"
           type="text" 
-          placeholder="Search books by title or author" 
+          placeholder="Search by book title or topic..." 
           oninput="filterBooks()"
-          class="w-full bg-white border border-amber-900/10 rounded-xl pl-10 pr-4 py-2 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-800/20 shadow-sm transition"
+          class="w-full bg-white border border-amber-900/15 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-900/30 shadow-sm transition"
         >
       </div>
     </div>
 
-    <!-- Book Grid List -->
+    <!-- Books Grid -->
     <div id="booksGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <!-- Default Sample Book Card (Rich Dad Poor Dad) -->
-      <div class="bg-white border border-amber-900/10 rounded-2xl p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between group">
-        <div>
-          <div class="h-44 w-full bg-[#7B181E] rounded-xl mb-4 flex flex-col items-center justify-center text-white p-4 text-center shadow-inner relative overflow-hidden">
-            <span class="text-amber-300 text-xs font-bold tracking-widest uppercase mb-1">Bestseller</span>
-            <span class="font-bold text-xl serif-font tracking-wide">RICH DAD<br>POOR DAD</span>
-            <span class="text-[11px] text-amber-200/80 mt-2">Robert T. Kiyosaki</span>
-          </div>
-          <h4 class="font-bold text-slate-900 text-base mb-1">Rich Dad Poor Dad</h4>
-          <p class="text-xs text-slate-500 mb-2">By Robert T. Kiyosaki • 3 Chapters Indexed</p>
-          <p class="text-xs text-slate-600 line-clamp-2">What the rich teach their kids about money that the poor and middle class do not!</p>
-        </div>
-        <div class="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">
-          <span class="text-[11px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full font-semibold">Ready to Chat</span>
-          <button onclick="openChatWithBook('Rich Dad Poor Dad', defaultSamplePages)" class="text-xs bg-amber-900 hover:bg-amber-950 text-white font-medium px-3.5 py-1.5 rounded-lg transition">
-            Talk with Book 🎙️
-          </button>
-        </div>
-      </div>
+      <!-- Cards populated dynamically via JavaScript -->
     </div>
   </main>
 
-  <!-- Upload Modal -->
-  <div id="uploadModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-md w-full p-6 border border-amber-900/15 shadow-2xl relative">
-      <button onclick="closeUploadModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-lg">✕</button>
-      <h3 class="text-xl font-bold text-slate-900 mb-1">Add a New Book</h3>
-      <p class="text-xs text-slate-500 mb-5">Upload a PDF to generate your interactive reading experience.</p>
+  <!-- Upload Book Modal -->
+  <div id="uploadModal" class="fixed inset-0 bg-slate-950/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="vintage-glass bg-[#FAF6F0] rounded-3xl max-w-md w-full p-6 sm:p-8 border border-amber-900/20 shadow-2xl relative">
+      <button onclick="closeUploadModal()" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-200/60 hover:bg-slate-300 text-slate-600 flex items-center justify-center text-sm font-bold transition">✕</button>
+      <h3 class="text-xl font-bold text-slate-900 mb-1 serif-title">Add New Book</h3>
+      <p class="text-xs text-slate-600 mb-6">Upload a PDF textbook to process chapters and enable voice exploration.</p>
       
       <div class="space-y-4">
         <div>
-          <label class="block text-xs font-semibold text-slate-700 mb-1">Book PDF File</label>
-          <div class="border-2 border-dashed border-amber-900/20 rounded-2xl p-6 text-center bg-[#FAF7F2] hover:bg-amber-50/50 transition cursor-pointer relative">
+          <label class="block text-xs font-bold text-slate-700 mb-1.5">PDF Document File</label>
+          <div class="border-2 border-dashed border-amber-900/30 rounded-2xl p-6 text-center bg-white/70 hover:bg-amber-50/50 transition cursor-pointer relative group">
             <input id="pdfInput" type="file" accept="application/pdf" class="absolute inset-0 opacity-0 cursor-pointer" onchange="handleFileSelected(event)">
             <div id="uploadPlaceholder">
-              <span class="text-3xl block mb-1">📄</span>
-              <p class="text-xs font-medium text-slate-700">Click to upload PDF</p>
-              <p class="text-[10px] text-slate-400 mt-1">Accepts any standard text PDF</p>
+              <div class="w-12 h-12 mx-auto rounded-full bg-amber-100 flex items-center justify-center text-2xl mb-2 text-amber-800 group-hover:scale-110 transition">📄</div>
+              <p class="text-xs font-semibold text-slate-800">Click or drag PDF here</p>
+              <p class="text-[10px] text-slate-500 mt-0.5">Supports academic textbooks, papers & notes</p>
             </div>
             <div id="uploadFileInfo" class="hidden">
-              <p id="uploadFileName" class="text-xs font-bold text-indigo-700 truncate"></p>
-              <span id="uploadStatusText" class="text-[11px] text-slate-500">Ready to index</span>
+              <div class="w-10 h-10 mx-auto rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-lg mb-1.5">✓</div>
+              <p id="uploadFileName" class="text-xs font-bold text-slate-900 truncate max-w-xs mx-auto"></p>
+              <span id="uploadStatusText" class="text-[11px] text-emerald-700 font-medium">Ready to process</span>
             </div>
           </div>
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-700 mb-1">Book Title (Optional)</label>
-          <input id="customTitleInput" type="text" placeholder="e.g., Computer Networks" class="w-full text-xs border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-900/20">
+          <label class="block text-xs font-bold text-slate-700 mb-1.5">Book Display Title (Optional)</label>
+          <input id="customTitleInput" type="text" placeholder="e.g., Operating Systems Concepts" class="w-full text-xs border border-amber-900/20 bg-white rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-amber-900/30 shadow-sm">
         </div>
 
-        <button id="processBtn" onclick="processAndSaveBook()" disabled class="w-full bg-amber-900 hover:bg-amber-950 disabled:opacity-40 text-white font-semibold py-2.5 rounded-xl text-sm transition">
-          Process Book & Start Chat
+        <button id="processBtn" onclick="processAndSaveBook()" disabled class="w-full bg-gradient-to-r from-amber-800 to-amber-950 hover:from-amber-900 hover:to-black disabled:opacity-40 text-white font-semibold py-3 rounded-xl text-xs transition shadow-md">
+          Synthesize Book & Start Chat
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Interactive Voice & AI Chat Panel Drawer -->
-  <div id="chatDrawer" class="fixed inset-y-0 right-0 w-full md:w-[480px] bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col border-l border-amber-900/10">
-    <!-- Chat Header -->
-    <div class="p-5 border-b border-slate-200 flex items-center justify-between bg-[#FAF7F2]">
+  <!-- Interactive Voice & AI Chat Drawer Panel -->
+  <div id="chatDrawer" class="fixed inset-y-0 right-0 w-full sm:w-[500px] bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col border-l border-amber-900/15">
+    
+    <!-- Drawer Header -->
+    <div class="p-4 sm:p-5 border-b border-amber-900/10 flex items-center justify-between bg-[#F8F5F0]">
       <div class="flex items-center space-x-3">
-        <span class="text-2xl">🎙️</span>
+        <div class="w-10 h-10 rounded-xl bg-amber-900 text-amber-100 flex items-center justify-center text-lg shadow-sm">
+          🎙️
+        </div>
         <div>
-          <h4 id="activeChatTitle" class="font-bold text-slate-900 text-sm truncate max-w-[240px]">Rich Dad Poor Dad</h4>
-          <span id="activePageBadge" class="text-[11px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full font-medium">3 Pages Active</span>
+          <h4 id="activeChatTitle" class="font-bold text-slate-900 text-sm truncate max-w-[220px]">Rich Dad Poor Dad</h4>
+          <span id="activePageBadge" class="text-[10px] text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded-full font-bold">3 Pages Indexed</span>
         </div>
       </div>
-      <button onclick="closeChatDrawer()" class="text-slate-400 hover:text-slate-600 text-sm font-bold p-1">✕</button>
+      <button onclick="closeChatDrawer()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center text-sm font-bold transition">✕</button>
     </div>
 
     <!-- Chat Messages Window -->
-    <div id="chatMessages" class="flex-1 overflow-y-auto p-5 space-y-3.5 bg-slate-50 text-sm">
-      <!-- Welcome message -->
+    <div id="chatMessages" class="flex-1 overflow-y-auto p-5 space-y-4 bg-[#FAF8F5] text-xs custom-scroll">
       <div class="flex flex-col items-start">
-        <div class="bg-white border border-slate-200 rounded-2xl p-3.5 max-w-[85%] text-slate-800 shadow-sm leading-relaxed text-xs">
-          Hey! I have analyzed this book. Ask me anything, or say <strong>"Summarize page 2"</strong>, or tap the microphone to talk!
+        <div class="bg-white border border-amber-900/10 rounded-2xl p-4 max-w-[88%] text-slate-800 shadow-sm leading-relaxed">
+          Hello! I am your <strong>Bookified Assistant</strong>. I have indexed the entire contents of this book. You can ask for an overall summary, inquire about specific concepts, or say <strong>"Summarize page 2"</strong>.
         </div>
       </div>
     </div>
 
-    <!-- Input Form & Mic Button -->
-    <div class="p-4 bg-white border-t border-slate-200">
+    <!-- Input Form & Real Voice Activation Button -->
+    <div class="p-3.5 bg-white border-t border-amber-900/10">
       <form onsubmit="sendChatMessage(event)" class="flex items-center space-x-2">
-        <button type="button" id="micBtn" onclick="toggleVoiceInput()" class="p-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 transition" title="Voice Input">
-          🎤
+        <button type="button" id="micBtn" onclick="toggleVoiceInput()" class="p-2.5 rounded-xl border border-amber-900/20 bg-amber-50 hover:bg-amber-100 text-amber-900 transition flex items-center justify-center" title="Voice Input (Chrome Speech Recognition)">
+          <span class="text-base">🎤</span>
         </button>
-        <input id="chatInput" type="text" placeholder="Ask about the book or 'Page 2'..." class="flex-1 text-xs border border-slate-200 rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-amber-900/20">
-        <button type="submit" class="bg-amber-900 hover:bg-amber-950 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition shadow-sm">
-          Send
+        <input id="chatInput" type="text" placeholder="Ask about the book or 'Summarize page 2'..." class="flex-1 text-xs border border-amber-900/20 rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-amber-900/30">
+        <button type="submit" class="bg-amber-900 hover:bg-amber-950 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition shadow-sm flex items-center gap-1">
+          <span>Send</span>
         </button>
       </form>
     </div>
   </div>
 
   <script>
+    // Set up PDF.js worker
     pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
-    // Sample fallback pages for instant demo
+    // Default Sample Data (3 Pages for immediate demonstration)
     const defaultSamplePages = [
-      { pageNumber: 1, text: "Lesson 1: The Rich Don't Work for Money. The poor and middle class work for money. The rich have money work for them. Fear and desire drive most people into the rat race." },
-      { pageNumber: 2, text: "Lesson 2: Why Teach Financial Literacy? It's not about how much money you make. It's about how much money you keep. An asset puts money in your pocket. A liability takes money out of your pocket." },
-      { pageNumber: 3, text: "Lesson 3: Mind Your Own Business. Start acquiring assets that you love and keep your expenses low. Reduce liabilities and build a solid asset foundation." }
+      { 
+        pageNumber: 1, 
+        text: "Lesson 1: The Rich Don't Work for Money. The poor and the middle class work for money. The rich have money work for them. Fear and greed are the two primary emotions that keep employees trapped in the rat race." 
+      },
+      { 
+        pageNumber: 2, 
+        text: "Lesson 2: Why Teach Financial Literacy? It's not about how much money you make; it's about how much money you keep. An asset is something that puts money in your pocket. A liability is something that takes money out of your pocket." 
+      },
+      { 
+        pageNumber: 3, 
+        text: "Lesson 3: Mind Your Own Business. Keep your daytime job, but start buying real assets, not liabilities or personal effects that have no real value once you get them home. Keep your expenses low and build investments." 
+      }
     ];
 
+    // Library Collection State
     let storedBooks = [
       {
-        id: 'sample-1',
+        id: 'book-1',
         title: 'Rich Dad Poor Dad',
         author: 'Robert T. Kiyosaki',
         pages: defaultSamplePages,
         pageCount: 3,
-        coverColor: '#7B181E'
+        coverTheme: 'from-[#8B1E24] to-[#4A0D11]',
+        tag: 'Finance & Mindset',
+        summary: 'Teaches financial independence and building wealth through investing in assets and financial literacy.'
+      },
+      {
+        id: 'book-2',
+        title: 'Clean Code: A Handbook of Agile Craftsmanship',
+        author: 'Robert C. Martin',
+        pages: [
+          { pageNumber: 1, text: "Chapter 1: Clean Code. Even bad code can function. But if code isn't clean, it can bring a development organization to its knees. Every year, countless hours and significant resources are lost because of poorly written code." },
+          { pageNumber: 2, text: "Chapter 2: Meaningful Names. Names should reveal intent. If a name requires a comment, then the name does not reveal its intent. Choose clear, pronounceable, and searchable names." }
+        ],
+        pageCount: 2,
+        coverTheme: 'from-[#1E3A8A] to-[#0F172A]',
+        tag: 'Software Engineering',
+        summary: 'Best practices for writing readable, maintainable, and robust code for software engineers.'
       }
     ];
 
     let currentBook = storedBooks[0];
     let selectedFile = null;
     let extractedPages = [];
-    let isVoiceOutputEnabled = true;
     let isListening = false;
     let speechRecognition = null;
+
+    // Initialize UI on load
+    window.addEventListener('DOMContentLoaded', () => {
+      renderBooks();
+    });
+
+    // Render Books Grid with dynamic cards
+    function renderBooks(filterText = '') {
+      const grid = document.getElementById('booksGrid');
+      grid.innerHTML = '';
+
+      const filtered = storedBooks.filter(b => 
+        b.title.toLowerCase().includes(filterText.toLowerCase()) || 
+        b.author.toLowerCase().includes(filterText.toLowerCase()) ||
+        b.tag.toLowerCase().includes(filterText.toLowerCase())
+      );
+
+      filtered.forEach(book => {
+        const card = document.createElement('div');
+        card.className = "vintage-glass rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group hover:-translate-y-1";
+        card.innerHTML = `
+          <div>
+            <div class="h-44 w-full bg-gradient-to-br ${book.coverTheme} rounded-xl mb-4 flex flex-col items-center justify-center text-white p-4 text-center book-shadow relative overflow-hidden">
+              <span class="text-amber-300 text-[10px] font-bold tracking-widest uppercase mb-1 border border-amber-300/40 px-2 py-0.5 rounded-full bg-black/20">${book.tag}</span>
+              <span class="font-bold text-base serif-title tracking-wide line-clamp-2 px-2">${book.title}</span>
+              <span class="text-[11px] text-amber-100/70 mt-1">${book.author}</span>
+            </div>
+            <h4 class="font-bold text-slate-900 text-sm mb-1 truncate">${book.title}</h4>
+            <p class="text-[11px] text-amber-900/70 font-semibold mb-2">${book.author} • ${book.pageCount} Pages Loaded</p>
+            <p class="text-xs text-slate-600 line-clamp-2 leading-relaxed">${book.summary}</p>
+          </div>
+          <div class="mt-4 pt-4 border-t border-amber-900/10 flex items-center justify-between">
+            <span class="text-[10px] bg-emerald-100/80 text-emerald-800 border border-emerald-300/60 px-2.5 py-0.5 rounded-full font-bold">Interactive AI Ready</span>
+            <button onclick='openChatWithBook(${JSON.stringify(book.title)}, ${JSON.stringify(book.pages)})' class="text-xs bg-amber-900 hover:bg-amber-950 text-white font-medium px-3.5 py-1.5 rounded-xl transition shadow-sm flex items-center gap-1.5">
+              <span>Talk with Book</span>
+              <span>🎙️</span>
+            </button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function filterBooks() {
+      const q = document.getElementById('searchBooksInput').value;
+      renderBooks(q);
+    }
 
     // Modal Operations
     function openUploadModal() {
@@ -235,15 +360,15 @@
       document.getElementById('uploadModal').classList.add('hidden');
     }
 
-    // Chat Drawer Operations
+    // Drawer Operations
     function openChatWithBook(title, pages) {
       currentBook = { title, pages };
       document.getElementById('activeChatTitle').innerText = title;
-      document.getElementById('activePageBadge').innerText = `${pages.length} Pages Active`;
+      document.getElementById('activePageBadge').innerText = `${pages.length} Pages Indexed`;
       document.getElementById('chatDrawer').classList.remove('translate-x-full');
       
-      // AI voice introduces the book automatically
-      speakResponse(`I have opened ${title}. What would you like to explore?`);
+      // Auto-voice introduction
+      speakResponse(`I have loaded ${title}. You can ask any question, or say: summarize page 1.`);
     }
 
     function closeChatDrawer() {
@@ -251,7 +376,7 @@
       window.speechSynthesis.cancel();
     }
 
-    // Handle Upload Selection
+    // PDF Extraction Engine
     async function handleFileSelected(event) {
       selectedFile = event.target.files[0];
       if (!selectedFile) return;
@@ -260,7 +385,7 @@
       const fileInfo = document.getElementById('uploadFileInfo');
       fileInfo.classList.remove('hidden');
       document.getElementById('uploadFileName').innerText = selectedFile.name;
-      document.getElementById('uploadStatusText').innerText = "Reading and indexing pages...";
+      document.getElementById('uploadStatusText').innerText = "Analyzing and indexing pages...";
 
       const processBtn = document.getElementById('processBtn');
       processBtn.disabled = true;
@@ -280,11 +405,11 @@
         document.getElementById('uploadStatusText').innerText = `✓ Successfully indexed ${pdf.numPages} pages`;
         processBtn.disabled = false;
       } catch (err) {
-        document.getElementById('uploadStatusText').innerText = "Failed to parse PDF. Try another file.";
+        document.getElementById('uploadStatusText').innerText = "Could not parse PDF. Please try a text-based PDF.";
       }
     }
 
-    // Save and Render New Book Card
+    // Save Book to Library
     function processAndSaveBook() {
       if (!selectedFile || extractedPages.length === 0) return;
 
@@ -297,7 +422,9 @@
         author: 'Uploaded Document',
         pages: extractedPages,
         pageCount: extractedPages.length,
-        coverColor: '#1E3A8A'
+        coverTheme: 'from-[#2D3748] to-[#1A202C]',
+        tag: 'Student Document',
+        summary: `Custom document containing ${extractedPages.length} parsed pages ready for interactive Q&A.`
       };
 
       storedBooks.unshift(newBook);
@@ -305,7 +432,7 @@
       closeUploadModal();
       openChatWithBook(newBook.title, newBook.pages);
 
-      // Reset Modal Inputs
+      // Reset modal fields
       selectedFile = null;
       extractedPages = [];
       document.getElementById('pdfInput').value = '';
@@ -314,47 +441,7 @@
       document.getElementById('customTitleInput').value = '';
     }
 
-    // Render Books Grid
-    function renderBooks(filterText = '') {
-      const grid = document.getElementById('booksGrid');
-      grid.innerHTML = '';
-
-      const filtered = storedBooks.filter(b => 
-        b.title.toLowerCase().includes(filterText.toLowerCase()) || 
-        b.author.toLowerCase().includes(filterText.toLowerCase())
-      );
-
-      filtered.forEach(book => {
-        const card = document.createElement('div');
-        card.className = "bg-white border border-amber-900/10 rounded-2xl p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between";
-        card.innerHTML = `
-          <div>
-            <div class="h-44 w-full rounded-xl mb-4 flex flex-col items-center justify-center text-white p-4 text-center shadow-inner relative overflow-hidden" style="background-color: ${book.coverColor};">
-              <span class="text-amber-300 text-xs font-bold tracking-widest uppercase mb-1">Interactive</span>
-              <span class="font-bold text-lg serif-font tracking-wide">${book.title}</span>
-              <span class="text-[11px] opacity-80 mt-1">${book.author}</span>
-            </div>
-            <h4 class="font-bold text-slate-900 text-base mb-1 truncate">${book.title}</h4>
-            <p class="text-xs text-slate-500 mb-2">${book.author} • ${book.pageCount} Pages Indexed</p>
-            <p class="text-xs text-slate-600 line-clamp-2">Complete interactive AI assistant ready with summaries and page lookups.</p>
-          </div>
-          <div class="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">
-            <span class="text-[11px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full font-semibold">Ready</span>
-            <button onclick='openChatWithBook(${JSON.stringify(book.title)}, ${JSON.stringify(book.pages)})' class="text-xs bg-amber-900 hover:bg-amber-950 text-white font-medium px-3.5 py-1.5 rounded-lg transition">
-              Talk with Book 🎙️
-            </button>
-          </div>
-        `;
-        grid.appendChild(card);
-      });
-    }
-
-    function filterBooks() {
-      const q = document.getElementById('searchBooksInput').value;
-      renderBooks(q);
-    }
-
-    // Chat Logic (Retrieval & Page Lookup)
+    // Chat Inference Logic (Page-filtered lookup + Keyword Search)
     function sendChatMessage(event) {
       if (event) event.preventDefault();
       const input = document.getElementById('chatInput');
@@ -366,38 +453,38 @@
 
       const pages = currentBook.pages || [];
       if (pages.length === 0) {
-        appendMessage('ai', "No pages found for this book.");
+        appendMessage('ai', "No pages are available to read for this book.");
         return;
       }
 
-      // 1. Direct Page Lookup
+      // Check for exact page numbers: "page 2", "pg 1"
       const pageMatch = query.match(/(?:page|pg\.?)\s*(\d+)/i);
       if (pageMatch) {
         const pageNum = parseInt(pageMatch[1], 10);
         const match = pages.find(p => p.pageNumber === pageNum);
         if (match && match.text.trim()) {
-          const excerpt = match.text.slice(0, 380);
+          const excerpt = match.text.slice(0, 360);
           const reply = `On Page ${pageNum}: "${excerpt}..."`;
           appendMessage('ai', reply, pageNum);
           speakResponse(reply);
         } else {
-          const reply = `Page ${pageNum} is empty or not in document range.`;
+          const reply = `Page ${pageNum} is blank or exceeds the total pages of this book.`;
           appendMessage('ai', reply);
           speakResponse(reply);
         }
         return;
       }
 
-      // 2. Summary Request
+      // Overall Summary
       if (query.toLowerCase().includes('summary') || query.toLowerCase().includes('overview')) {
-        const preview = pages.slice(0, 3).map(p => `(Page ${p.pageNumber}): ${p.text.slice(0, 120)}`).join('... ');
-        const reply = `Summary: This book contains ${pages.length} pages. Key starting ideas include: ${preview}...`;
+        const preview = pages.slice(0, 3).map(p => `(Pg ${p.pageNumber}) ${p.text.slice(0, 110)}`).join('... ');
+        const reply = `Document Summary: This book comprises ${pages.length} pages. Primary contents begin with: ${preview}...`;
         appendMessage('ai', reply);
         speakResponse(reply);
         return;
       }
 
-      // 3. Keyword / Concept Match
+      // Semantic/Keyword Search
       const terms = query.toLowerCase().split(/\s+/).filter(w => w.length > 3);
       let bestPage = null;
       let topScore = 0;
@@ -415,11 +502,11 @@
       });
 
       if (bestPage && topScore > 0) {
-        const reply = `In Page ${bestPage.pageNumber}: "${bestPage.text.slice(0, 350)}..."`;
+        const reply = `Found on Page ${bestPage.pageNumber}: "${bestPage.text.slice(0, 320)}..."`;
         appendMessage('ai', reply, bestPage.pageNumber);
         speakResponse(reply);
       } else {
-        const reply = "I could not find a direct mention of that concept in the text. You can ask for a specific page number or general summary.";
+        const reply = "I could not find a direct section addressing that. You can specify an exact page number or request an overview.";
         appendMessage('ai', reply);
         speakResponse(reply);
       }
@@ -430,13 +517,13 @@
       const div = document.createElement('div');
       div.className = `flex flex-col ${sender === 'user' ? 'items-end' : 'items-start'}`;
 
-      const citation = page ? `<div class="mt-1 pt-1 border-t text-[10px] text-amber-900 font-bold">Source: Page ${page}</div>` : '';
+      const citation = page ? `<div class="mt-1.5 pt-1 border-t border-amber-900/10 text-[10px] text-amber-900 font-bold">Citation: Page ${page}</div>` : '';
 
       div.innerHTML = `
-        <div class="max-w-[85%] rounded-2xl p-3 leading-relaxed text-xs ${
+        <div class="max-w-[88%] rounded-2xl p-3.5 leading-relaxed text-xs shadow-sm ${
           sender === 'user'
             ? 'bg-amber-900 text-white'
-            : 'bg-white border border-slate-200 text-slate-800 shadow-sm'
+            : 'bg-white border border-amber-900/15 text-slate-800'
         }">
           <p>${text}</p>
           ${citation}
@@ -446,29 +533,22 @@
       container.scrollTop = container.scrollHeight;
     }
 
-    // Voice Output (Text to Speech)
+    // Spoken Voice Output (TTS)
     function speakResponse(text) {
-      if (!isVoiceOutputEnabled || !('speechSynthesis' in window)) return;
+      if (!('speechSynthesis' in window)) return;
       window.speechSynthesis.cancel();
-      const cleanText = text.replace(/["*]/g, '');
-      const utterance = new SpeechSynthesisUtterance(cleanText);
+      const clean = text.replace(/["*]/g, '');
+      const utterance = new SpeechSynthesisUtterance(clean);
       utterance.rate = 1.0;
       utterance.pitch = 1.0;
       window.speechSynthesis.speak(utterance);
     }
 
-    function toggleVoiceOutput() {
-      isVoiceOutputEnabled = !isVoiceOutputEnabled;
-      const btn = document.getElementById('voiceToggleBtn');
-      btn.innerText = isVoiceOutputEnabled ? '🔊 AI Voice: ON' : '🔇 AI Voice: OFF';
-      if (!isVoiceOutputEnabled) window.speechSynthesis.cancel();
-    }
-
-    // Voice Input (Speech to Text)
+    // Voice Input via SpeechRecognition
     function toggleVoiceInput() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) {
-        alert("Voice recognition requires Google Chrome.");
+        alert("Please use Google Chrome to enable microphone speech input.");
         return;
       }
 
