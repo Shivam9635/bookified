@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Bookified - Interactive AI Reader Platform</title>
+  <title>Bookified - AI Reader Platform</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Tailwind CSS CDN -->
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- PDF.js CDN for in-browser client PDF parsing -->
+  <!-- PDF.js for client-side processing -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,44 +18,35 @@
       font-family: 'Plus Jakarta Sans', sans-serif;
       background-color: #F8F5F0;
       background-image: 
-        radial-gradient(at 0% 0%, rgba(217, 196, 169, 0.25) 0px, transparent 50%),
-        radial-gradient(at 100% 100%, rgba(180, 140, 100, 0.15) 0px, transparent 50%),
-        radial-gradient(at 50% 50%, rgba(245, 239, 230, 0.6) 0px, transparent 100%);
+        radial-gradient(at 0% 0%, rgba(217, 196, 169, 0.35) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(180, 140, 100, 0.22) 0px, transparent 50%),
+        radial-gradient(at 50% 30%, rgba(245, 239, 230, 0.8) 0px, transparent 80%),
+        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%238d6e63' fill-opacity='0.035' fill-rule='evenodd'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E");
       background-attachment: fixed;
     }
-    .serif-title {
-      font-family: 'Cinzel', serif;
-    }
+    .serif-title { font-family: 'Cinzel', serif; }
     .vintage-glass {
-      background: rgba(255, 255, 255, 0.75);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(180, 140, 100, 0.22);
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(160, 115, 75, 0.22);
     }
     .banner-glass {
-      background: linear-gradient(135deg, rgba(246, 237, 224, 0.95) 0%, rgba(237, 222, 203, 0.85) 100%);
-      border: 1px solid rgba(160, 115, 75, 0.25);
+      background: linear-gradient(135deg, rgba(246, 237, 224, 0.96) 0%, rgba(235, 218, 198, 0.88) 100%);
+      border: 1px solid rgba(160, 115, 75, 0.28);
     }
     .book-shadow {
-      box-shadow: 0 14px 28px -4px rgba(60, 40, 20, 0.15), 0 8px 12px -6px rgba(60, 40, 20, 0.1);
+      box-shadow: 0 16px 30px -6px rgba(50, 30, 15, 0.22), 0 8px 12px -4px rgba(50, 30, 15, 0.12);
     }
-    .custom-scroll::-webkit-scrollbar {
-      width: 5px;
-    }
-    .custom-scroll::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.03);
-    }
-    .custom-scroll::-webkit-scrollbar-thumb {
-      background: rgba(160, 115, 75, 0.25);
-      border-radius: 9999px;
-    }
+    .custom-scroll::-webkit-scrollbar { width: 5px; }
+    .custom-scroll::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.03); }
+    .custom-scroll::-webkit-scrollbar-thumb { background: rgba(160, 115, 75, 0.28); border-radius: 9999px; }
   </style>
 </head>
-<body class="text-slate-800 flex flex-col min-h-screen custom-scroll selection:bg-amber-800 selection:text-white">
+<body class="text-slate-800 flex flex-col min-h-screen custom-scroll selection:bg-amber-900 selection:text-white">
 
   <!-- Navigation Bar -->
-  <header class="sticky top-0 z-40 bg-[#FAF6F0]/85 backdrop-blur-md border-b border-amber-900/10 px-6 sm:px-10 py-3.5 flex items-center justify-between transition-all">
-    <!-- Brand Logo -->
+  <header class="sticky top-0 z-40 bg-[#FAF6F0]/90 backdrop-blur-md border-b border-amber-900/10 px-6 sm:px-12 py-3.5 flex items-center justify-between shadow-sm">
     <div class="flex items-center space-x-3 cursor-pointer" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
       <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-800 via-amber-900 to-amber-950 text-amber-100 flex items-center justify-center shadow-md border border-amber-700/30">
         <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
@@ -63,23 +54,26 @@
         </svg>
       </div>
       <div>
-        <h1 class="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-1.5">
-          <span>Bookified</span>
-          <span class="text-[10px] uppercase tracking-wider font-semibold bg-amber-100 text-amber-900 px-2 py-0.5 rounded-full border border-amber-300">PBL</span>
-        </h1>
-        <p class="text-[10px] text-amber-900/60 font-medium">Interactive AI Reader Assistant</p>
+        <h1 class="text-xl font-bold tracking-tight text-slate-900">Bookified</h1>
+        <p class="text-[10px] text-amber-900/70 font-medium">Interactive AI Reader Platform</p>
       </div>
     </div>
     
-    <!-- Navigation Links -->
-    <nav class="flex items-center space-x-7 text-xs font-semibold text-slate-600">
-      <a href="#" class="text-amber-900 border-b-2 border-amber-900 pb-1 transition">Library</a>
-      <button onclick="openUploadModal()" class="hover:text-amber-900 transition flex items-center gap-1">
-        <span>Add New</span>
+    <!-- Navigation Options -->
+    <nav class="flex items-center space-x-7 text-xs font-semibold text-slate-700">
+      <a href="#" class="text-amber-950 border-b-2 border-amber-900 pb-0.5">Library</a>
+      <button onclick="openUploadModal()" class="hover:text-amber-900 transition">Add New</button>
+      <button onclick="openPricingModal()" class="hover:text-amber-900 transition flex items-center gap-1">
+        <span>Pricing</span>
+        <span class="text-[9px] bg-amber-200 text-amber-900 px-1.5 py-0.2 rounded-full font-bold">SOON</span>
       </button>
-      <a href="#" class="hover:text-amber-900 transition hidden sm:inline-block">Pricing</a>
-      <button class="hover:text-amber-900 transition hidden sm:inline-block">Sign In</button>
-      <button onclick="openUploadModal()" class="bg-gradient-to-r from-amber-800 to-amber-950 text-white px-4 py-2 rounded-xl shadow-sm hover:shadow-md hover:from-amber-900 hover:to-black transition text-xs font-medium flex items-center gap-1.5">
+      
+      <!-- Dynamic Auth User Display -->
+      <div id="authNavSection">
+        <button onclick="openAuthModal()" class="hover:text-amber-900 transition font-semibold">Sign in</button>
+      </div>
+
+      <button onclick="openUploadModal()" class="bg-gradient-to-r from-amber-800 to-amber-950 text-white px-4 py-2 rounded-xl shadow-sm hover:shadow-md transition text-xs font-medium flex items-center gap-1.5">
         <span>+ Upload Book</span>
       </button>
     </nav>
@@ -90,24 +84,22 @@
 
     <!-- Hero / "Your Library" Banner -->
     <div class="banner-glass rounded-3xl p-8 sm:p-10 shadow-sm relative overflow-hidden mb-12 flex flex-col md:flex-row items-center justify-between gap-8">
-      
-      <!-- Ambient Lighting Blobs -->
       <div class="absolute -right-20 -top-20 w-80 h-80 bg-amber-400/20 rounded-full blur-3xl pointer-events-none"></div>
-      <div class="absolute -left-20 -bottom-20 w-80 h-80 bg-orange-400/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -left-20 -bottom-20 w-80 h-80 bg-orange-400/15 rounded-full blur-3xl pointer-events-none"></div>
 
       <!-- Left Column -->
       <div class="max-w-md z-10 text-center md:text-left">
-        <span class="inline-block text-[11px] font-bold uppercase tracking-widest text-amber-900/70 mb-2 bg-amber-200/50 px-3 py-1 rounded-full border border-amber-300/60">
-          Smart Digital Learning
+        <span class="inline-block text-[11px] font-bold uppercase tracking-widest text-amber-950/70 mb-2 bg-amber-200/60 px-3 py-1 rounded-full border border-amber-300/70">
+          Digital Learning Assistant
         </span>
         <h2 class="text-3xl sm:text-4xl font-bold text-slate-900 mb-3 serif-title">Your Library</h2>
         <p class="text-slate-700 text-sm leading-relaxed mb-6">
-          Convert static books into interactive conversations. Extract page-level summaries, ask technical questions, and learn hands-free.
+          Convert static documents into interactive conversations. Extract page-level summaries, ask technical questions, and converse hands-free.
         </p>
         <div class="flex items-center justify-center md:justify-start gap-3">
           <button onclick="openUploadModal()" class="bg-amber-900 hover:bg-amber-950 text-white font-semibold px-5 py-3 rounded-xl shadow-md transition flex items-center space-x-2 text-xs">
             <span class="text-base leading-none">+</span>
-            <span>Add New Book</span>
+            <span>Add new book</span>
           </button>
           <button onclick="openChatWithBook('Rich Dad Poor Dad', defaultSamplePages)" class="vintage-glass hover:bg-white text-slate-800 font-semibold px-5 py-3 rounded-xl shadow-sm transition border border-amber-900/15 text-xs flex items-center gap-2">
             <span>Try Sample 🎙️</span>
@@ -115,12 +107,12 @@
         </div>
       </div>
 
-      <!-- Center Thematic Library Illustration -->
+      <!-- Center Thematic Library Badge -->
       <div class="hidden lg:flex items-center justify-center relative select-none">
-        <div class="relative w-44 h-44 rounded-2xl bg-amber-900/5 border border-amber-900/15 flex items-center justify-center backdrop-blur-sm p-4 rotate-2 hover:rotate-0 transition duration-500 shadow-sm">
+        <div class="relative w-44 h-44 rounded-2xl bg-amber-900/5 border border-amber-900/20 flex items-center justify-center backdrop-blur-sm p-4 rotate-2 hover:rotate-0 transition duration-500 shadow-sm">
           <div class="text-center">
             <span class="text-6xl block mb-2 filter drop-shadow">📚</span>
-            <span class="text-[11px] font-bold text-amber-950 tracking-wider uppercase">Synthesized AI</span>
+            <span class="text-[11px] font-bold text-amber-950 tracking-wider uppercase">Interactive AI</span>
           </div>
         </div>
       </div>
@@ -130,22 +122,22 @@
         <div class="flex items-start space-x-3.5">
           <span class="w-8 h-8 rounded-xl bg-amber-900/10 border border-amber-900/20 flex items-center justify-center text-xs font-bold text-amber-900 shrink-0">1</span>
           <div>
-            <h4 class="text-xs font-bold text-slate-900">Upload PDF Book</h4>
-            <p class="text-[11px] text-slate-600">Select any PDF chapter or manual</p>
+            <h4 class="text-xs font-bold text-slate-900">Upload PDF</h4>
+            <p class="text-[11px] text-slate-600">Add your book file</p>
           </div>
         </div>
         <div class="flex items-start space-x-3.5">
           <span class="w-8 h-8 rounded-xl bg-amber-900/10 border border-amber-900/20 flex items-center justify-center text-xs font-bold text-amber-900 shrink-0">2</span>
           <div>
-            <h4 class="text-xs font-bold text-slate-900">Smart Page Indexing</h4>
-            <p class="text-[11px] text-slate-600">Extracts structured page metadata</p>
+            <h4 class="text-xs font-bold text-slate-900">AI Processing</h4>
+            <p class="text-[11px] text-slate-600">We analyze the content</p>
           </div>
         </div>
         <div class="flex items-start space-x-3.5">
           <span class="w-8 h-8 rounded-xl bg-amber-900/10 border border-amber-900/20 flex items-center justify-center text-xs font-bold text-amber-900 shrink-0">3</span>
           <div>
-            <h4 class="text-xs font-bold text-slate-900">Voice & Text Q&A</h4>
-            <p class="text-[11px] text-slate-600">Get spoken answers and citations</p>
+            <h4 class="text-xs font-bold text-slate-900">Voice Chat</h4>
+            <p class="text-[11px] text-slate-600">Discuss with AI</p>
           </div>
         </div>
       </div>
@@ -155,14 +147,14 @@
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
       <div>
         <h3 class="text-2xl font-bold text-slate-900 serif-title">Recent Books</h3>
-        <p class="text-xs text-slate-500 mt-0.5">Pick a book from your collection to start conversational learning</p>
+        <p class="text-xs text-slate-500 mt-0.5">Explore parsed textbooks and interact with chapter contents</p>
       </div>
       <div class="relative w-full sm:w-80">
         <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 text-xs">🔍</span>
         <input 
           id="searchBooksInput"
           type="text" 
-          placeholder="Search by book title or topic..." 
+          placeholder="Search books by title, author, or tag..." 
           oninput="filterBooks()"
           class="w-full bg-white border border-amber-900/15 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-900/30 shadow-sm transition"
         >
@@ -170,52 +162,202 @@
     </div>
 
     <!-- Books Grid -->
-    <div id="booksGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <!-- Cards populated dynamically via JavaScript -->
-    </div>
+    <div id="booksGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
   </main>
 
-  <!-- Upload Book Modal -->
-  <div id="uploadModal" class="fixed inset-0 bg-slate-950/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="vintage-glass bg-[#FAF6F0] rounded-3xl max-w-md w-full p-6 sm:p-8 border border-amber-900/20 shadow-2xl relative">
-      <button onclick="closeUploadModal()" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-200/60 hover:bg-slate-300 text-slate-600 flex items-center justify-center text-sm font-bold transition">✕</button>
-      <h3 class="text-xl font-bold text-slate-900 mb-1 serif-title">Add New Book</h3>
-      <p class="text-xs text-slate-600 mb-6">Upload a PDF textbook to process chapters and enable voice exploration.</p>
+  <!-- ADD BOOK MODAL WITH FULL CUSTOM FIELDS -->
+  <div id="uploadModal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="vintage-glass bg-[#FAF6F0] rounded-3xl max-w-lg w-full p-6 sm:p-8 border border-amber-900/25 shadow-2xl relative max-h-[90vh] overflow-y-auto custom-scroll">
+      <button onclick="closeUploadModal()" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-200/70 hover:bg-slate-300 text-slate-700 flex items-center justify-center text-sm font-bold transition">✕</button>
+      <h3 class="text-xl font-bold text-slate-900 mb-1 serif-title">Add a New Book</h3>
+      <p class="text-xs text-slate-600 mb-5">Upload a PDF and customize its metadata for your personal AI library.</p>
       
       <div class="space-y-4">
+        <!-- PDF File Picker -->
         <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1.5">PDF Document File</label>
-          <div class="border-2 border-dashed border-amber-900/30 rounded-2xl p-6 text-center bg-white/70 hover:bg-amber-50/50 transition cursor-pointer relative group">
+          <label class="block text-xs font-bold text-slate-700 mb-1.5">Book PDF File <span class="text-red-500">*</span></label>
+          <div class="border-2 border-dashed border-amber-900/35 rounded-2xl p-5 text-center bg-white/70 hover:bg-amber-50/60 transition cursor-pointer relative group">
             <input id="pdfInput" type="file" accept="application/pdf" class="absolute inset-0 opacity-0 cursor-pointer" onchange="handleFileSelected(event)">
             <div id="uploadPlaceholder">
-              <div class="w-12 h-12 mx-auto rounded-full bg-amber-100 flex items-center justify-center text-2xl mb-2 text-amber-800 group-hover:scale-110 transition">📄</div>
-              <p class="text-xs font-semibold text-slate-800">Click or drag PDF here</p>
-              <p class="text-[10px] text-slate-500 mt-0.5">Supports academic textbooks, papers & notes</p>
+              <span class="text-3xl block mb-1 text-amber-900 group-hover:scale-110 transition inline-block">📄</span>
+              <p class="text-xs font-semibold text-slate-800">Click or drag PDF book here</p>
+              <p class="text-[10px] text-slate-500 mt-0.5">Supports multi-page textbooks, lecture notes & guides</p>
             </div>
             <div id="uploadFileInfo" class="hidden">
-              <div class="w-10 h-10 mx-auto rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-lg mb-1.5">✓</div>
+              <span class="text-xl block mb-1 text-emerald-700 font-bold">✓</span>
               <p id="uploadFileName" class="text-xs font-bold text-slate-900 truncate max-w-xs mx-auto"></p>
-              <span id="uploadStatusText" class="text-[11px] text-emerald-700 font-medium">Ready to process</span>
+              <span id="uploadStatusText" class="text-[11px] text-emerald-700 font-medium">Ready to index</span>
             </div>
           </div>
         </div>
 
+        <!-- Custom Title -->
         <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1.5">Book Display Title (Optional)</label>
-          <input id="customTitleInput" type="text" placeholder="e.g., Operating Systems Concepts" class="w-full text-xs border border-amber-900/20 bg-white rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-amber-900/30 shadow-sm">
+          <label class="block text-xs font-bold text-slate-700 mb-1">Book Title</label>
+          <input id="bookTitleInput" type="text" placeholder="e.g., Database Management Systems" class="w-full text-xs border border-amber-900/20 bg-white rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-amber-900/30">
         </div>
 
-        <button id="processBtn" onclick="processAndSaveBook()" disabled class="w-full bg-gradient-to-r from-amber-800 to-amber-950 hover:from-amber-900 hover:to-black disabled:opacity-40 text-white font-semibold py-3 rounded-xl text-xs transition shadow-md">
-          Synthesize Book & Start Chat
+        <!-- Author Name -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Author Name</label>
+            <input id="bookAuthorInput" type="text" placeholder="e.g., Dr. A. K. Sharma" class="w-full text-xs border border-amber-900/20 bg-white rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-amber-900/30">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Subject / Category Tag</label>
+            <input id="bookCategoryInput" type="text" placeholder="e.g., Computer Science" class="w-full text-xs border border-amber-900/20 bg-white rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-amber-900/30">
+          </div>
+        </div>
+
+        <!-- Cover Theme Palette Picker -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1.5">Cover Theme Color</label>
+          <div class="flex items-center space-x-3">
+            <label class="cursor-pointer">
+              <input type="radio" name="coverColor" value="from-[#7B181E] to-[#450A0E]" checked class="hidden peer">
+              <div class="w-7 h-7 rounded-full bg-[#7B181E] peer-checked:ring-2 peer-checked:ring-amber-900 ring-offset-2"></div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="coverColor" value="from-[#1E3A8A] to-[#0F172A]" class="hidden peer">
+              <div class="w-7 h-7 rounded-full bg-[#1E3A8A] peer-checked:ring-2 peer-checked:ring-amber-900 ring-offset-2"></div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="coverColor" value="from-[#065F46] to-[#022C22]" class="hidden peer">
+              <div class="w-7 h-7 rounded-full bg-[#065F46] peer-checked:ring-2 peer-checked:ring-amber-900 ring-offset-2"></div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="coverColor" value="from-[#581C87] to-[#2E1065]" class="hidden peer">
+              <div class="w-7 h-7 rounded-full bg-[#581C87] peer-checked:ring-2 peer-checked:ring-amber-900 ring-offset-2"></div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="coverColor" value="from-[#78350F] to-[#451A03]" class="hidden peer">
+              <div class="w-7 h-7 rounded-full bg-[#78350F] peer-checked:ring-2 peer-checked:ring-amber-900 ring-offset-2"></div>
+            </label>
+          </div>
+        </div>
+
+        <button id="processBtn" onclick="processAndSaveBook()" disabled class="w-full bg-gradient-to-r from-amber-800 to-amber-950 hover:from-amber-900 hover:to-black disabled:opacity-40 text-white font-semibold py-3 rounded-xl text-xs transition shadow-md mt-2">
+          Add Book to Library & Start AI Chat
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Interactive Voice & AI Chat Drawer Panel -->
+  <!-- SIGN IN & SIGN UP MODAL -->
+  <div id="authModal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="vintage-glass bg-[#FAF6F0] rounded-3xl max-w-sm w-full p-6 sm:p-7 border border-amber-900/25 shadow-2xl relative">
+      <button onclick="closeAuthModal()" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-200/70 hover:bg-slate-300 text-slate-700 flex items-center justify-center text-sm font-bold transition">✕</button>
+      
+      <div class="flex items-center justify-center space-x-6 border-b border-amber-900/15 pb-3 mb-5">
+        <button id="authTabSignIn" onclick="switchAuthTab('signin')" class="text-sm font-bold text-amber-950 border-b-2 border-amber-900 pb-1">Sign In</button>
+        <button id="authTabSignUp" onclick="switchAuthTab('signup')" class="text-sm font-semibold text-slate-500 hover:text-amber-950 pb-1">Create Account</button>
+      </div>
+
+      <!-- Sign In Form -->
+      <form id="signInForm" onsubmit="handleSignIn(event)" class="space-y-3.5">
+        <div>
+          <label class="block text-[11px] font-bold text-slate-700 mb-1">Email Address</label>
+          <input id="signInEmail" type="email" required placeholder="you@example.com" class="w-full text-xs border border-amber-900/20 bg-white rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-amber-900/30">
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-slate-700 mb-1">Password</label>
+          <input id="signInPassword" type="password" required placeholder="••••••••" class="w-full text-xs border border-amber-900/20 bg-white rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-amber-900/30">
+        </div>
+        <button type="submit" class="w-full bg-amber-900 hover:bg-amber-950 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow-sm mt-2">
+          Sign In
+        </button>
+      </form>
+
+      <!-- Sign Up Form -->
+      <form id="signUpForm" onsubmit="handleSignUp(event)" class="space-y-3.5 hidden">
+        <div>
+          <label class="block text-[11px] font-bold text-slate-700 mb-1">Full Name</label>
+          <input id="signUpName" type="text" required placeholder="Your Name" class="w-full text-xs border border-amber-900/20 bg-white rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-amber-900/30">
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-slate-700 mb-1">Email Address</label>
+          <input id="signUpEmail" type="email" required placeholder="you@university.edu" class="w-full text-xs border border-amber-900/20 bg-white rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-amber-900/30">
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-slate-700 mb-1">Password</label>
+          <input id="signUpPassword" type="password" required placeholder="Create password" class="w-full text-xs border border-amber-900/20 bg-white rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-amber-900/30">
+        </div>
+        <button type="submit" class="w-full bg-amber-900 hover:bg-amber-950 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow-sm mt-2">
+          Create Free Account
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- PRICING POP-UP (COMING SOON) -->
+  <div id="pricingModal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="vintage-glass bg-[#FAF6F0] rounded-3xl max-w-2xl w-full p-6 sm:p-8 border border-amber-900/25 shadow-2xl relative">
+      <button onclick="closePricingModal()" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-200/70 hover:bg-slate-300 text-slate-700 flex items-center justify-center text-sm font-bold transition">✕</button>
+      
+      <div class="text-center mb-6">
+        <span class="text-[10px] font-bold uppercase tracking-widest text-amber-900 bg-amber-200/60 border border-amber-300 px-3 py-1 rounded-full">Coming Soon</span>
+        <h3 class="text-2xl font-bold text-slate-900 mt-2 serif-title">Simple Academic Plans</h3>
+        <p class="text-xs text-slate-600 mt-1">Unlock larger storage quotas and multi-language live synthesis.</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <!-- Starter Tier -->
+        <div class="bg-white/80 border border-amber-900/15 rounded-2xl p-4 flex flex-col justify-between">
+          <div>
+            <h4 class="font-bold text-slate-900 text-sm">Free Student</h4>
+            <div class="my-2">
+              <span class="text-2xl font-bold text-slate-900">₹0</span>
+              <span class="text-[10px] text-slate-500">/ forever</span>
+            </div>
+            <ul class="text-[11px] text-slate-600 space-y-1.5 mt-3">
+              <li>✓ Up to 5 Books</li>
+              <li>✓ Voice & Text Q&A</li>
+              <li>✓ Page Citation Lookup</li>
+            </ul>
+          </div>
+          <button class="w-full mt-4 bg-slate-200 text-slate-700 py-1.5 rounded-lg text-xs font-semibold" disabled>Active Plan</button>
+        </div>
+
+        <!-- Pro Tier -->
+        <div class="bg-gradient-to-b from-amber-900 to-amber-950 text-white rounded-2xl p-4 flex flex-col justify-between shadow-lg relative overflow-hidden">
+          <div class="absolute -top-3 -right-3 bg-amber-400 text-amber-950 text-[9px] font-bold px-4 py-1 rotate-12">SOON</div>
+          <div>
+            <h4 class="font-bold text-amber-200 text-sm">Pro Researcher</h4>
+            <div class="my-2">
+              <span class="text-2xl font-bold">₹199</span>
+              <span class="text-[10px] text-amber-300">/ month</span>
+            </div>
+            <ul class="text-[11px] text-amber-100 space-y-1.5 mt-3">
+              <li>✓ Unlimited PDF Books</li>
+              <li>✓ Full Textbook Summaries</li>
+              <li>✓ Cross-Book Comparison</li>
+            </ul>
+          </div>
+          <button onclick="alert('Pro plan subscriptions will open soon!')" class="w-full mt-4 bg-amber-400 hover:bg-amber-300 text-amber-950 py-1.5 rounded-lg text-xs font-bold transition">Notify Me</button>
+        </div>
+
+        <!-- Institutional Tier -->
+        <div class="bg-white/80 border border-amber-900/15 rounded-2xl p-4 flex flex-col justify-between">
+          <div>
+            <h4 class="font-bold text-slate-900 text-sm">Campus License</h4>
+            <div class="my-2">
+              <span class="text-xl font-bold text-slate-900">Custom</span>
+              <span class="text-[10px] text-slate-500">/ institute</span>
+            </div>
+            <ul class="text-[11px] text-slate-600 space-y-1.5 mt-3">
+              <li>✓ Department Library Sync</li>
+              <li>✓ Bulk Student Accounts</li>
+              <li>✓ Faculty Analytics Panel</li>
+            </ul>
+          </div>
+          <button onclick="alert('Campus inquiries: contact support@bookified.edu')" class="w-full mt-4 border border-amber-900/30 text-amber-950 hover:bg-amber-50 py-1.5 rounded-lg text-xs font-semibold transition">Inquire</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE VOICE & AI CHAT DRAWER -->
   <div id="chatDrawer" class="fixed inset-y-0 right-0 w-full sm:w-[500px] bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col border-l border-amber-900/15">
-    
-    <!-- Drawer Header -->
     <div class="p-4 sm:p-5 border-b border-amber-900/10 flex items-center justify-between bg-[#F8F5F0]">
       <div class="flex items-center space-x-3">
         <div class="w-10 h-10 rounded-xl bg-amber-900 text-amber-100 flex items-center justify-center text-lg shadow-sm">
@@ -229,50 +371,39 @@
       <button onclick="closeChatDrawer()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center text-sm font-bold transition">✕</button>
     </div>
 
-    <!-- Chat Messages Window -->
+    <!-- Message Window -->
     <div id="chatMessages" class="flex-1 overflow-y-auto p-5 space-y-4 bg-[#FAF8F5] text-xs custom-scroll">
       <div class="flex flex-col items-start">
-        <div class="bg-white border border-amber-900/10 rounded-2xl p-4 max-w-[88%] text-slate-800 shadow-sm leading-relaxed">
-          Hello! I am your <strong>Bookified Assistant</strong>. I have indexed the entire contents of this book. You can ask for an overall summary, inquire about specific concepts, or say <strong>"Summarize page 2"</strong>.
+        <div class="bg-white border border-amber-900/15 rounded-2xl p-4 max-w-[88%] text-slate-800 shadow-sm leading-relaxed">
+          Hello! I have analyzed this book. Ask me anything, or say <strong>"Summarize page 2"</strong>, or click the microphone to speak!
         </div>
       </div>
     </div>
 
-    <!-- Input Form & Real Voice Activation Button -->
+    <!-- Query Bar & Mic Button -->
     <div class="p-3.5 bg-white border-t border-amber-900/10">
       <form onsubmit="sendChatMessage(event)" class="flex items-center space-x-2">
-        <button type="button" id="micBtn" onclick="toggleVoiceInput()" class="p-2.5 rounded-xl border border-amber-900/20 bg-amber-50 hover:bg-amber-100 text-amber-900 transition flex items-center justify-center" title="Voice Input (Chrome Speech Recognition)">
+        <button type="button" id="micBtn" onclick="toggleVoiceInput()" class="p-2.5 rounded-xl border border-amber-900/20 bg-amber-50 hover:bg-amber-100 text-amber-900 transition flex items-center justify-center" title="Voice Input">
           <span class="text-base">🎤</span>
         </button>
         <input id="chatInput" type="text" placeholder="Ask about the book or 'Summarize page 2'..." class="flex-1 text-xs border border-amber-900/20 rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-amber-900/30">
-        <button type="submit" class="bg-amber-900 hover:bg-amber-950 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition shadow-sm flex items-center gap-1">
-          <span>Send</span>
+        <button type="submit" class="bg-amber-900 hover:bg-amber-950 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition shadow-sm">
+          Send
         </button>
       </form>
     </div>
   </div>
 
   <script>
-    // Set up PDF.js worker
     pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
-    // Default Sample Data (3 Pages for immediate demonstration)
+    // Sample fallback pages
     const defaultSamplePages = [
-      { 
-        pageNumber: 1, 
-        text: "Lesson 1: The Rich Don't Work for Money. The poor and the middle class work for money. The rich have money work for them. Fear and greed are the two primary emotions that keep employees trapped in the rat race." 
-      },
-      { 
-        pageNumber: 2, 
-        text: "Lesson 2: Why Teach Financial Literacy? It's not about how much money you make; it's about how much money you keep. An asset is something that puts money in your pocket. A liability is something that takes money out of your pocket." 
-      },
-      { 
-        pageNumber: 3, 
-        text: "Lesson 3: Mind Your Own Business. Keep your daytime job, but start buying real assets, not liabilities or personal effects that have no real value once you get them home. Keep your expenses low and build investments." 
-      }
+      { pageNumber: 1, text: "Lesson 1: The Rich Don't Work for Money. The poor and middle class work for money. The rich have money work for them. Fear and desire drive most employees into the rat race." },
+      { pageNumber: 2, text: "Lesson 2: Why Teach Financial Literacy? It's not about how much money you make; it's about how much money you keep. An asset puts money in your pocket. A liability takes money out of your pocket." },
+      { pageNumber: 3, text: "Lesson 3: Mind Your Own Business. Start acquiring assets that you love and keep your expenses low. Reduce liabilities and build an asset column." }
     ];
 
-    // Library Collection State
     let storedBooks = [
       {
         id: 'book-1',
@@ -280,22 +411,22 @@
         author: 'Robert T. Kiyosaki',
         pages: defaultSamplePages,
         pageCount: 3,
-        coverTheme: 'from-[#8B1E24] to-[#4A0D11]',
+        coverTheme: 'from-[#7B181E] to-[#450A0E]',
         tag: 'Finance & Mindset',
-        summary: 'Teaches financial independence and building wealth through investing in assets and financial literacy.'
+        summary: 'Teaches financial literacy and building wealth through assets rather than relying purely on a paycheck.'
       },
       {
         id: 'book-2',
         title: 'Clean Code: A Handbook of Agile Craftsmanship',
         author: 'Robert C. Martin',
         pages: [
-          { pageNumber: 1, text: "Chapter 1: Clean Code. Even bad code can function. But if code isn't clean, it can bring a development organization to its knees. Every year, countless hours and significant resources are lost because of poorly written code." },
-          { pageNumber: 2, text: "Chapter 2: Meaningful Names. Names should reveal intent. If a name requires a comment, then the name does not reveal its intent. Choose clear, pronounceable, and searchable names." }
+          { pageNumber: 1, text: "Chapter 1: Clean Code. Even bad code can function. But if code isn't clean, it can bring a development organization to its knees. Hours and resources are lost because of poorly written code." },
+          { pageNumber: 2, text: "Chapter 2: Meaningful Names. Names should reveal intent. If a name requires a comment, then the name does not reveal its intent." }
         ],
         pageCount: 2,
         coverTheme: 'from-[#1E3A8A] to-[#0F172A]',
         tag: 'Software Engineering',
-        summary: 'Best practices for writing readable, maintainable, and robust code for software engineers.'
+        summary: 'Best practices for writing readable, maintainable, and reliable software.'
       }
     ];
 
@@ -304,13 +435,13 @@
     let extractedPages = [];
     let isListening = false;
     let speechRecognition = null;
+    let currentUser = null;
 
-    // Initialize UI on load
     window.addEventListener('DOMContentLoaded', () => {
       renderBooks();
     });
 
-    // Render Books Grid with dynamic cards
+    // Render Books Grid
     function renderBooks(filterText = '') {
       const grid = document.getElementById('booksGrid');
       grid.innerHTML = '';
@@ -323,7 +454,7 @@
 
       filtered.forEach(book => {
         const card = document.createElement('div');
-        card.className = "vintage-glass rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group hover:-translate-y-1";
+        card.className = "vintage-glass rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between hover:-translate-y-1";
         card.innerHTML = `
           <div>
             <div class="h-44 w-full bg-gradient-to-br ${book.coverTheme} rounded-xl mb-4 flex flex-col items-center justify-center text-white p-4 text-center book-shadow relative overflow-hidden">
@@ -332,7 +463,7 @@
               <span class="text-[11px] text-amber-100/70 mt-1">${book.author}</span>
             </div>
             <h4 class="font-bold text-slate-900 text-sm mb-1 truncate">${book.title}</h4>
-            <p class="text-[11px] text-amber-900/70 font-semibold mb-2">${book.author} • ${book.pageCount} Pages Loaded</p>
+            <p class="text-[11px] text-amber-900/80 font-semibold mb-2">${book.author} • ${book.pageCount} Pages Loaded</p>
             <p class="text-xs text-slate-600 line-clamp-2 leading-relaxed">${book.summary}</p>
           </div>
           <div class="mt-4 pt-4 border-t border-amber-900/10 flex items-center justify-between">
@@ -353,30 +484,70 @@
     }
 
     // Modal Operations
-    function openUploadModal() {
-      document.getElementById('uploadModal').classList.remove('hidden');
-    }
-    function closeUploadModal() {
-      document.getElementById('uploadModal').classList.add('hidden');
+    function openUploadModal() { document.getElementById('uploadModal').classList.remove('hidden'); }
+    function closeUploadModal() { document.getElementById('uploadModal').classList.add('hidden'); }
+    function openPricingModal() { document.getElementById('pricingModal').classList.remove('hidden'); }
+    function closePricingModal() { document.getElementById('pricingModal').classList.add('hidden'); }
+    function openAuthModal() { document.getElementById('authModal').classList.remove('hidden'); }
+    function closeAuthModal() { document.getElementById('authModal').classList.add('hidden'); }
+
+    // Auth Tab Switching
+    function switchAuthTab(tab) {
+      const signInForm = document.getElementById('signInForm');
+      const signUpForm = document.getElementById('signUpForm');
+      const tabSignIn = document.getElementById('authTabSignIn');
+      const tabSignUp = document.getElementById('authTabSignUp');
+
+      if (tab === 'signin') {
+        signInForm.classList.remove('hidden');
+        signUpForm.classList.add('hidden');
+        tabSignIn.className = 'text-sm font-bold text-amber-950 border-b-2 border-amber-900 pb-1';
+        tabSignUp.className = 'text-sm font-semibold text-slate-500 hover:text-amber-950 pb-1';
+      } else {
+        signInForm.classList.add('hidden');
+        signUpForm.classList.remove('hidden');
+        tabSignUp.className = 'text-sm font-bold text-amber-950 border-b-2 border-amber-900 pb-1';
+        tabSignIn.className = 'text-sm font-semibold text-slate-500 hover:text-amber-950 pb-1';
+      }
     }
 
-    // Drawer Operations
-    function openChatWithBook(title, pages) {
-      currentBook = { title, pages };
-      document.getElementById('activeChatTitle').innerText = title;
-      document.getElementById('activePageBadge').innerText = `${pages.length} Pages Indexed`;
-      document.getElementById('chatDrawer').classList.remove('translate-x-full');
-      
-      // Auto-voice introduction
-      speakResponse(`I have loaded ${title}. You can ask any question, or say: summarize page 1.`);
+    function handleSignIn(e) {
+      e.preventDefault();
+      const email = document.getElementById('signInEmail').value;
+      const name = email.split('@')[0];
+      setAuthenticatedUser(name);
+      closeAuthModal();
     }
 
-    function closeChatDrawer() {
-      document.getElementById('chatDrawer').classList.add('translate-x-full');
-      window.speechSynthesis.cancel();
+    function handleSignUp(e) {
+      e.preventDefault();
+      const name = document.getElementById('signUpName').value;
+      setAuthenticatedUser(name);
+      closeAuthModal();
     }
 
-    // PDF Extraction Engine
+    function setAuthenticatedUser(name) {
+      currentUser = name;
+      const container = document.getElementById('authNavSection');
+      container.innerHTML = `
+        <div class="flex items-center space-x-2 bg-amber-100/70 border border-amber-300/80 px-2.5 py-1 rounded-xl">
+          <div class="w-5 h-5 rounded-full bg-amber-900 text-white flex items-center justify-center text-[10px] font-bold">
+            ${name.charAt(0).toUpperCase()}
+          </div>
+          <span class="text-xs font-semibold text-amber-950">${name}</span>
+          <button onclick="signOutUser()" class="text-[10px] text-amber-900/60 hover:text-red-600 font-bold ml-1">✕</button>
+        </div>
+      `;
+    }
+
+    function signOutUser() {
+      currentUser = null;
+      document.getElementById('authNavSection').innerHTML = `
+        <button onclick="openAuthModal()" class="hover:text-amber-900 transition font-semibold">Sign in</button>
+      `;
+    }
+
+    // PDF Extraction
     async function handleFileSelected(event) {
       selectedFile = event.target.files[0];
       if (!selectedFile) return;
@@ -402,28 +573,32 @@
           extractedPages.push({ pageNumber: i, text: pageText });
         }
 
-        document.getElementById('uploadStatusText').innerText = `✓ Successfully indexed ${pdf.numPages} pages`;
+        document.getElementById('uploadStatusText').innerText = `✓ Indexed ${pdf.numPages} pages`;
         processBtn.disabled = false;
       } catch (err) {
-        document.getElementById('uploadStatusText').innerText = "Could not parse PDF. Please try a text-based PDF.";
+        document.getElementById('uploadStatusText').innerText = "Failed to parse PDF. Try another file.";
       }
     }
 
-    // Save Book to Library
+    // Save Book with Custom Fields
     function processAndSaveBook() {
       if (!selectedFile || extractedPages.length === 0) return;
 
-      const userTitle = document.getElementById('customTitleInput').value.trim();
-      const finalTitle = userTitle || selectedFile.name.replace('.pdf', '');
+      const title = document.getElementById('bookTitleInput').value.trim() || selectedFile.name.replace('.pdf', '');
+      const author = document.getElementById('bookAuthorInput').value.trim() || 'Uploaded Document';
+      const category = document.getElementById('bookCategoryInput').value.trim() || 'Study Notes';
+      
+      const colorRadio = document.querySelector('input[name="coverColor"]:checked');
+      const coverTheme = colorRadio ? colorRadio.value : 'from-[#7B181E] to-[#450A0E]';
 
       const newBook = {
         id: 'book-' + Date.now(),
-        title: finalTitle,
-        author: 'Uploaded Document',
+        title: title,
+        author: author,
         pages: extractedPages,
         pageCount: extractedPages.length,
-        coverTheme: 'from-[#2D3748] to-[#1A202C]',
-        tag: 'Student Document',
+        coverTheme: coverTheme,
+        tag: category,
         summary: `Custom document containing ${extractedPages.length} parsed pages ready for interactive Q&A.`
       };
 
@@ -432,16 +607,31 @@
       closeUploadModal();
       openChatWithBook(newBook.title, newBook.pages);
 
-      // Reset modal fields
+      // Reset fields
       selectedFile = null;
       extractedPages = [];
       document.getElementById('pdfInput').value = '';
       document.getElementById('uploadPlaceholder').classList.remove('hidden');
       document.getElementById('uploadFileInfo').classList.add('hidden');
-      document.getElementById('customTitleInput').value = '';
+      document.getElementById('bookTitleInput').value = '';
+      document.getElementById('bookAuthorInput').value = '';
+      document.getElementById('bookCategoryInput').value = '';
     }
 
-    // Chat Inference Logic (Page-filtered lookup + Keyword Search)
+    // Chat Drawer & Speech Logic
+    function openChatWithBook(title, pages) {
+      currentBook = { title, pages };
+      document.getElementById('activeChatTitle').innerText = title;
+      document.getElementById('activePageBadge').innerText = `${pages.length} Pages Indexed`;
+      document.getElementById('chatDrawer').classList.remove('translate-x-full');
+      speakResponse(`I have opened ${title}. Ask me any question, or ask for a summary of page 1.`);
+    }
+
+    function closeChatDrawer() {
+      document.getElementById('chatDrawer').classList.add('translate-x-full');
+      window.speechSynthesis.cancel();
+    }
+
     function sendChatMessage(event) {
       if (event) event.preventDefault();
       const input = document.getElementById('chatInput');
@@ -453,11 +643,11 @@
 
       const pages = currentBook.pages || [];
       if (pages.length === 0) {
-        appendMessage('ai', "No pages are available to read for this book.");
+        appendMessage('ai', "No text content found for this book.");
         return;
       }
 
-      // Check for exact page numbers: "page 2", "pg 1"
+      // 1. Page-specific lookup
       const pageMatch = query.match(/(?:page|pg\.?)\s*(\d+)/i);
       if (pageMatch) {
         const pageNum = parseInt(pageMatch[1], 10);
@@ -475,7 +665,7 @@
         return;
       }
 
-      // Overall Summary
+      // 2. Summary
       if (query.toLowerCase().includes('summary') || query.toLowerCase().includes('overview')) {
         const preview = pages.slice(0, 3).map(p => `(Pg ${p.pageNumber}) ${p.text.slice(0, 110)}`).join('... ');
         const reply = `Document Summary: This book comprises ${pages.length} pages. Primary contents begin with: ${preview}...`;
@@ -484,7 +674,7 @@
         return;
       }
 
-      // Semantic/Keyword Search
+      // 3. Keyword / Concept search
       const terms = query.toLowerCase().split(/\s+/).filter(w => w.length > 3);
       let bestPage = null;
       let topScore = 0;
@@ -492,13 +682,8 @@
       pages.forEach(p => {
         let score = 0;
         const low = p.text.toLowerCase();
-        terms.forEach(term => {
-          score += (low.split(term).length - 1);
-        });
-        if (score > topScore) {
-          topScore = score;
-          bestPage = p;
-        }
+        terms.forEach(term => { score += (low.split(term).length - 1); });
+        if (score > topScore) { topScore = score; bestPage = p; }
       });
 
       if (bestPage && topScore > 0) {
@@ -533,7 +718,6 @@
       container.scrollTop = container.scrollHeight;
     }
 
-    // Spoken Voice Output (TTS)
     function speakResponse(text) {
       if (!('speechSynthesis' in window)) return;
       window.speechSynthesis.cancel();
@@ -544,11 +728,10 @@
       window.speechSynthesis.speak(utterance);
     }
 
-    // Voice Input via SpeechRecognition
     function toggleVoiceInput() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) {
-        alert("Please use Google Chrome to enable microphone speech input.");
+        alert("Microphone recognition requires Google Chrome.");
         return;
       }
 
