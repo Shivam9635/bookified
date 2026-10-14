@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bookified - AI Reader Assistant</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+<body class="bg-slate-100 text-slate-800 h-screen flex flex-col font-sans">
+  <header class="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between shadow-sm">
+    <div class="flex items-center space-x-3">
+      <span class="text-2xl">📖</span>
+      <div>
+        <h1 class="font-bold text-lg text-indigo-700">Bookified</h1>
+        <p class="text-xs text-slate-500">Interactive AI Book Reader & Assistant</p>
+      </div>
+    </div>
+    <div class="flex items-center space-x-3">
+      <label class="cursor-pointer bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-4 py-2 rounded-lg font-medium transition">
+        <span>+ Upload PDF</span>
+        <input id="pdfInput" type="file" accept="application/pdf" class="hidden">
+      </label>
+      <button id="ttsToggle" onclick="toggleSpeech()" class="px-3 py-2 text-xs bg-slate-100 hover:bg-slate-200 border rounded-lg text-slate-700">
+        🔊 Voice: ON
+      </button>
+    </div>
+  </header>
+
+  <main class="flex-1 flex overflow-hidden">
+    <section class="w-1/2 p-4 border-r border-slate-200 bg-white flex flex-col">
+      <div class="flex justify-between items-center mb-3">
+        <h2 id="currentBookTitle" class="font-semibold text-slate-700 truncate max-w-xs">No Book Selected</h2>
+        <span id="pageCountBadge" class="text-xs bg-indigo-50 text-indigo-600 font-semibold px-2 py-1 rounded">0 Pages Loaded</span>
+      </div>
+      <div id="pagesList" class="flex-1 overflow-y-auto space-y-3 pr-2">
+        <div class="h-full flex flex-col items-center justify-center text-slate-400 text-center p-6 border-2 border-dashed border-slate-200 rounded-xl">
+          <span class="text-4xl mb-2">📄</span>
+          <p class="text-sm font-medium">Upload any PDF book above to extract pages and start interactive reading.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="w-1/2 flex flex-col bg-slate-50">
+      <div id="chatBox" class="flex-1 p-4 overflow-y-auto space-y-3">
+        <div class="flex flex-col items-start">
+          <div class="bg-white border border-slate-200 text-slate-800 p-3 rounded-xl max-w-[85%] text-sm shadow-sm">
+            Hello! I am your <strong>Bookified</strong> assistant. Upload a book, then ask me for an overall summary, a specific concept, or say <em>"What is on page 2?"</em>.
+          </div>
+        </div>
+      </div>
+
+      <div class="p-3 bg-white border-t border-slate-200">
+        <form onsubmit="handleQuery(event)" class="flex items-center space-x-2">
+          <button type="button" id="micBtn" onclick="toggleVoiceRecognition()" class="p-2.5 rounded-lg border bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm">
+            🎤
+          </button>
+          <input id="userInput" type="text" placeholder="Ask about this book or specify a page..." class="flex-1 px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 text-sm rounded-lg font-medium transition">
+            Send
+          </button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    let bookPages = [];
+    let isSpeechEnabled = true;
+    let isListening = false;
+    let recognition = null;
+
+    pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+    document.getElementById('pdfInput').addEventListener('change', async function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      document.getElementById('currentBookTitle').innerText = file.name.replace('.pdf', '');
+      const pagesContainer = document.getElementById('pagesList');
+      pagesContainer.innerHTML = '<p class="text-xs text-indigo-500 p-2">Extracting pages from PDF...</p>';
+
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      
+      bookPages = [];
+      pagesContainer.innerHTML = '';
+
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items.map(item => item.str).join(' ');
+
+        bookPages.push({ pageNumber: i, text: pageText });
+
+        const card = document.createElement('div');
+        card.className = 'border border-slate-200 rounded-lg p-3 bg-slate-50 text-xs text-slate-600';
+        card.id = `page-card-${i}`;
+        card.innerHTML = `<span class="font-bold text-indigo-600 block mb-1">Page ${i}</span>
+                          <p class="line-clamp-3 leading-relaxed">${pageText || '<em>[Blank or Image-only Page]</em>'}</p>`;
+        pagesContainer.appendChild(card);
+      }
+
+      document.getElementById('pageCountBadge').innerText = `${pdf.numPages} Pages Loaded`;
+      appendChatMessage('ai', `Successfully loaded "${file.name}" with ${pdf.numPages} pages.`);
+    });
+
+    function handleQuery(e) {
+      if (e) e.preventDefault();
+      const input = document.getElementById('userInput');
+      const query = input.value.trim();
+      if (!query) return;
+
+      appendChatMessage('user', query);
+      input.value = '';
+
+      if (bookPages.length === 0) {
+        appendChatMessage('ai', 'Please upload a PDF book first.');
+        return;
+      }
+
+      const pageMatch = query.match(/(?:page|pg\.?)\s*(\d+)/i);
+      if (pageMatch) {
+        const requestedPage = parseInt(pageMatch[1], 10);
+        const found = bookPages.find(p => p.pageNumber === requestedPage);
+        if (found && found.text.trim()) {
+          appendChatMessage('ai', `On Page ${requestedPage}: "${found.text.slice(0, 450)}..."`, requestedPage);
+          highlightPage(requestedPage);
+        } else {
+          appendChatMessage('ai', `Page ${requestedPage} is empty or not in document range.`);
+        }
+        return;
+      }
+
+      if (query.toLowerCase().includes('summary') || query.toLowerCase().includes('overview')) {
+        const fullSample = bookPages.slice(0, 3).map(p => `(Pg ${p.pageNumber}) ${p.text.slice(0, 150)}`).join('... ');
+        appendChatMessage('ai', `Book Summary Overview: The document covers ${bookPages.length} pages. Primary contents begin with: ${fullSample}...`);
+        return;
+      }
+
+      const terms = query.toLowerCase().split(/\s+/).filter(t => t.length > 3);
+      let bestMatch = null;
+      let maxScore = 0;
+
+      bookPages.forEach(p => {
+        let score = 0;
+        const lower = p.text.toLowerCase();
+        terms.forEach(t => { score += (lower.split(t).length - 1); });
+        if (score > maxScore) { maxScore = score; bestMatch = p; }
+      });
+
+      if (bestMatch && maxScore > 0) {
+        appendChatMessage('ai', `Found in Page ${bestMatch.pageNumber}: "${bestMatch.text.slice(0, 400)}..."`, bestMatch.pageNumber);
+        highlightPage(bestMatch.pageNumber);
+      } else {
+        appendChatMessage('ai', "I couldn't find a direct match. Try asking by page number.");
+      }
+    }
+
+    function appendChatMessage(sender, text, pageCitation = null) {
+      const box = document.getElementById('chatBox');
+      const wrapper = document.createElement('div');
+      wrapper.className = `flex flex-col ${sender === 'user' ? 'items-end' : 'items-start'}`;
+      let citationHtml = pageCitation ? `<div class="mt-1 pt-1 border-t text-[11px] text-indigo-600 font-semibold">Source: Page ${pageCitation}</div>` : '';
+      wrapper.innerHTML = `
+        <div class="max-w-[85%] p-3 rounded-xl text-sm leading-relaxed ${sender === 'user' ? 'bg-indigo-600 text-white' : 'bg-white border border-slate-200 text-slate-800 shadow-sm'}">
+          <p>${text}</p>
+          ${citationHtml}
+        </div>`;
+      box.appendChild(wrapper);
+      box.scrollTop = box.scrollHeight;
+
+      if (sender === 'ai' && isSpeechEnabled) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text.replace(/["*]/g, ''));
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    function highlightPage(pageNum) {
+      const el = document.getElementById(`page-card-${pageNum}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.classList.add('ring-2', 'ring-indigo-500', 'bg-indigo-50');
+        setTimeout(() => el.classList.remove('ring-2', 'ring-indigo-500', 'bg-indigo-50'), 2500);
+      }
+    }
+
+    function toggleSpeech() {
+      isSpeechEnabled = !isSpeechEnabled;
+      document.getElementById('ttsToggle').innerText = isSpeechEnabled ? '🔊 Voice: ON' : '🔇 Voice: OFF';
+      if (!isSpeechEnabled) window.speechSynthesis.cancel();
+    }
+
+    function toggleVoiceRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        alert("Use Google Chrome for voice input.");
+        return;
+      }
+      const micBtn = document.getElementById('micBtn');
+      if (isListening && recognition) { recognition.stop(); return; }
+
+      recognition = new SpeechRecognition();
+      recognition.lang = 'en-US';
+      recognition.continuous = false;
+      recognition.onstart = () => { isListening = true; micBtn.classList.add('bg-red-500', 'text-white', 'animate-pulse'); };
+      recognition.onend = () => { isListening = false; micBtn.classList.remove('bg-red-500', 'text-white', 'animate-pulse'); };
+      recognition.onresult = (e) => {
+        document.getElementById('userInput').value = e.results[0][0].transcript;
+        handleQuery();
+      };
+      recognition.start();
+    }
+  </script>
+</body>
+</html>
